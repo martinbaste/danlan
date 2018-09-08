@@ -1,0 +1,26 @@
+{
+  "name": "danlan",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "http://martinbaste.github.io/danlan",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "google-translate-api": "^2.3.0",
+    "react": "^16.5.0",
+    "react-bootstrap": "^0.32.4",
+    "react-dom": "^16.5.0",
+    "react-scripts": "1.1.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "devDependencies": {
+    "gh": "^1.13.2",
+    "pages": "0.0.16"
+  }
+}
