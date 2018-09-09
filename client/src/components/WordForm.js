@@ -10,14 +10,32 @@ function getRandomInt(min, max) {
 class WordForm extends Component {
   constructor() {
     super();
+    const remaining = [];
+    for (let i = 0; i < 100; i++) {
+      remaining.push(i);
+    }
     this.state = {
       wordI : getRandomInt(0,99),
       result: "",
       entry: "",
-      score: [0,0],
+      remaining,
       fails: [],
       successes: []
     };
+  }
+
+  getRandomWord() {
+    const pool = this.state.remaining.concat(this.state.fails);
+    return pool[getRandomInt(0,pool.length)];
+  }
+
+  removeFromRemaining = (wordI) => {
+    const remaining = this.state.remaining;
+    const remainingI = remaining.indexOf(wordI);
+    if (remainingI >= 0) {
+      remaining.splice(remainingI, 1);
+    }
+    return remaining;
   }
 
   checkWord = (e) => {
@@ -25,21 +43,24 @@ class WordForm extends Component {
     const entry = this.state.entry;
     let wordI = this.state.wordI;
     const translation = words[wordI][1];
-    let result;
-    let score = this.state.score;
+    let message;
     let successes = this.state.successes;
     let fails = this.state.fails;
-    if (entry === translation) {
-      result = "good boi";
-      score = [score[0] + 1, score[1]]
+    const remaining = this.removeFromRemaining(wordI);
+
+    if (entry.toLowerCase() === translation.toLowerCase()) {
+      message = "good boi";
       successes = successes.concat(wordI);
       const fI = fails.indexOf(wordI);
       if (fI !== -1) {
         fails.splice(fI,1);
       }
     } else {
-      result = `u rekt, was ${translation}`;
-      score = [score[0], score[1] + 1]
+      message = (
+        <span>u rekt, it was: 
+          <strong> {translation.toLowerCase()}</strong>
+        </span>
+      );
       fails = fails.concat(wordI);
       const sI = successes.indexOf(wordI);
       if (sI !== -1) {
@@ -47,40 +68,43 @@ class WordForm extends Component {
       }
     }
     this.setState({
-      result,
-      wordI: getRandomInt(0,99),
+      message,
+      wordI: this.getRandomWord(),
       entry: "",
-      score,
       successes,
-      fails
+      fails,
+      remaining
     });
 
   }
   
+  getWord = (i) => {
+    return words[i][0];
+  }
+
   render() {
-    const word = words[this.state.wordI][0]
+    const word = this.getWord(this.state.wordI)
     return (
       <div>
         <div>
-          {word}
+          <h2>{word}</h2>
         </div>
         <form onSubmit={this.checkWord}>
           <input value={this.state.entry} onChange={(e) => this.setState({entry: e.target.value})}/>
+          <button>></button>
         </form>
         <div>
-          {this.state.result}<br/>
-        </div>
-        <div>
-          U good: {this.state.score[0]}<br/>
-          Get out: {this.state.score[1]}
+          {this.state.message}<br/>
+          {this.state.remaining.length + 
+            this.state.fails.length} words to go.
         </div>
         <div className="row">
           <div className="col-xs-6">
-            Success:
+            U good ({this.state.successes.length}):
             {this.state.successes.map((i)=>(<li>{words[i][0]}</li>))}
           </div>
           <div className="col-xs-6">
-            Fails:
+            Nope ({this.state.fails.length}):
             {this.state.fails.map((i)=>(<li>{words[i][0]}</li>))}
           </div>
         </div>
